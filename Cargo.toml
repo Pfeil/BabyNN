@@ -1,7 +1,7 @@
 [package]
-name = "simple_nn"
+name = "baby_nn"
 version = "0.1.0"
-authors = ["verpfeilt"]
+authors = ["Andreas Pfeil"]
 
 [dependencies]
 rulinalg = "0.4.2"
