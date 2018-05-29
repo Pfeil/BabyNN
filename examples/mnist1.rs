@@ -1,8 +1,8 @@
 extern crate csv;
-extern crate simple_nn;
+extern crate baby_nn;
 
 use csv::ReaderBuilder;
-use simple_nn::{Sample, Vector, NN};
+use baby_nn::{Sample, Vector, NN};
 use std::f64;
 
 /// This struct is supposed to represent the given data, not adjusted to the neural net.

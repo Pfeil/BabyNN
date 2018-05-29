@@ -22,9 +22,9 @@ use activation_fn::sigmoid;
 /// let hidden_len = 3;
 /// let output_len = 5;
 /// let learn_rate = 0.3;
-/// let nn = simple_nn::NN::new(input_len, hidden_len, output_len, learn_rate);
+/// let nn = baby_nn::NN::new(input_len, hidden_len, output_len, learn_rate);
 /// // TODO Train your net before querying, otherwise it will output something more or less random.
-/// let input = simple_nn::Vector::new(vec![5., 0.]);
+/// let input = baby_nn::Vector::new(vec![5., 0.]);
 /// let output = nn.query(&input);
 /// assert_eq!(output.size(), output_len);
 /// ```
@@ -72,13 +72,13 @@ impl NN {
         let output_error = &sample.target - &output;
         let hidden_error = self.weights_ho.transpose() * &output_error;
         // Gradient Descent
-        let ones = Vector::from_fn(self.num_output_neurons(), |_| 1f64);
+        let ones = Vector::from_fn(output.size(), |_| 1f64);
         let ones_minus_output = &ones - &output;
         self.weights_ho += self.learn_rate
             * (output_error
                 .elemul(&output.clone().elemul(&ones_minus_output))
                 .dot(&hidden_out));
-        let ones = Vector::from_fn(self.num_hidden_neurons(), |_| 1f64);
+        let ones = Vector::from_fn(hidden_out.size(), |_| 1f64);
         let ones_minus_hidden_out = ones - &hidden_out;
         self.weights_ih += self.learn_rate
             * (hidden_error
