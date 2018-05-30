@@ -9,7 +9,7 @@ const INP: usize = 784;
 const OUT: usize = 10;
 
 /// This struct is supposed to represent the given data, not adjusted to the neural net.
-/// Due to the implemented From-Trait, it is easily to create a Sample from it.
+/// Due to the implemented From-Trait, it is easy to create a Sample from it.
 #[derive(Debug)]
 struct LabeledImage {
     label: u8,
