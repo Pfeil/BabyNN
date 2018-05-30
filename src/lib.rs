@@ -43,7 +43,7 @@ impl NN {
     pub fn new(num_input: usize, num_hidden: usize, num_output: usize, learn_rate: f64) -> Self {
         // prepare random number generator.
         let sqrt_num_input = (num_input as f64).powf(-0.5);
-        let sqrt_num_hidden = (num_input as f64).powf(-0.5);
+        let sqrt_num_hidden = (num_hidden as f64).powf(-0.5);
         let random_in = Normal::new(0.0, sqrt_num_input);
         let random_hid = Normal::new(0.0, sqrt_num_hidden);
         let rng = &mut rand::thread_rng();
@@ -158,6 +158,41 @@ mod tests {
         let input = Vector::new(vec![5.; inp]);
         let output = nn.query(&input);
         assert_eq!(out, output.size());
-        println!("{}", output);
+        //println!("{}", output);
+    }
+
+    #[test]
+    fn init_weight_sanity_check() {
+        let inp = 784;
+        let hid = 100;
+        let out = 10;
+        let learn_rate = 0.3;
+        let nn = NN::new(inp, hid, out, learn_rate);
+        // check boundaries
+        nn.weights_ih.clone().into_vec().into_iter().for_each(|x| {
+            if x.abs() >= 1.0 {
+                panic!()
+            }
+        });
+        nn.weights_ho.clone().into_vec().into_iter().for_each(|x| {
+            if x.abs() >= 1.0 {
+                panic!()
+            }
+        });
+        // check absolute maximum: max(x.abs()) for each x.
+        let max: f64 = nn.weights_ih
+            .clone()
+            .into_vec()
+            .into_iter()
+            .fold(0f64, |res, x| if x.abs() > res { x } else { res });
+        println!("Max absolute in weights in->hid: {}", max);
+        assert!(max < 1f64);
+        let max: f64 = nn.weights_ho
+            .clone()
+            .into_vec()
+            .into_iter()
+            .fold(0f64, |res, x| if x.abs() > res { x } else { res });
+        println!("Max absolute in weights hid->out: {}", max);
+        assert!(max < 1f64);
     }
 }
