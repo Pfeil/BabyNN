@@ -5,6 +5,9 @@ use csv::ReaderBuilder;
 use baby_nn::{Sample, Vector, NN};
 use std::f64;
 
+const INP: usize = 784;
+const OUT: usize = 10;
+
 /// This struct is supposed to represent the given data, not adjusted to the neural net.
 /// Due to the implemented From-Trait, it is easily to create a Sample from it.
 #[derive(Debug)]
@@ -70,14 +73,9 @@ fn main() {
         .map(|img| img.into()) // into() here equals to Sample::from(img). Rust is magic :)
         .collect(); // collect all samples to match the given type of `training_samples`.
     // set up network topology and learning rate
-    // Note: I assume here (inp = 784 and out = 10),
-    // that all our input data (the csv files) has this given size,
-    // and our output vector has always length 10. I did not validate this to shorten the code.
-    let inp = 784;
     let hid = 100;
-    let out = 10;
     let learn_rate = 0.3;
-    let mut nn = NN::new(inp, hid, out, learn_rate);
+    let mut nn = NN::new(INP, hid, OUT, learn_rate);
     // train the network
     for _epoch in 0..10 {
         for sample in &training_samples {
