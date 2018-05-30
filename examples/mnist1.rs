@@ -41,7 +41,7 @@ impl From<LabeledImage> for Sample {
 
 /// Since our neural network uses the sigmoid function, we need to adjust our byte data to fit into the interval [0,1]. More percisely, it needs to exclude 0.0 and 1.1 specifically, since the sigmoid function used will never return 0 or 1. This means our outputs should be in this interval, and a general rule says that the input should be based on the same interval as the output.
 fn byte_into_nn_compatible(num: u8) -> f64 {
-    ((num as f64 / 255.0) * 0.99) + 0.01
+    ((num as f64 / 255.0) * 0.98) + 0.01 // NOTE reference uses 0.99 instead of 0.98
 }
 
 fn read_labeled_images(path: &str) -> Vec<LabeledImage> {
