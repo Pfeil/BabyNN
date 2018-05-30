@@ -80,7 +80,7 @@ fn main() {
     let learn_rate = 0.3;
     let mut nn = NN::new(INP, hid, OUT, learn_rate);
     // train the network
-    for _epoch in 0..10 {
+    for _epoch in 0..1 {
         for sample in &training_samples {
             println!("training sample...");
             nn.train(&sample);
