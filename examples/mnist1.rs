@@ -29,6 +29,9 @@ impl From<LabeledImage> for Sample {
             .into_iter()
             .map(|byte| byte_into_nn_compatible(byte))
             .collect();
+        // make sure that the input fits into our NN topology (input/output neurons amount).
+        assert_eq!(image.len(), INP);
+        assert_eq!(label.len(), OUT);
         Sample {
             input: Vector::new(image),
             target: Vector::new(label),
