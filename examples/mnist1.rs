@@ -65,16 +65,15 @@ fn read_labeled_images(path: &str) -> Vec<LabeledImage> {
             image: tail.to_vec(),
         });
     }
-    //println!("{:?}", samples);
     samples
 }
 
 fn main() {
     // load training data
     let training_samples: Vec<Sample> = read_labeled_images("examples/mnist_train_100.csv")
-        .into_iter() // for each sample... (iterating over them)
-        .map(|img| img.into()) // into() here equals to Sample::from(img). Rust is magic :)
-        .collect(); // collect all samples to match the given type of `training_samples`.
+        .into_iter()
+        .map(|img| Sample::from(img))
+        .collect(); // collect into Vec<Sample> type.
     // set up network topology and learning rate
     let hid = 100;
     let learn_rate = 0.3;
