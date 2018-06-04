@@ -13,7 +13,7 @@ pub use rulinalg::matrix::BaseMatrix;
 use rulinalg::matrix::Matrix;
 pub use rulinalg::vector::Vector;
 
-use activation_fn::sigmoid;
+use activation_fn::Sigmoid;
 
 /// This represents a minimal neural net.
 /// # Examples
@@ -72,18 +72,17 @@ impl NN {
         let output_error = &sample.target - &output;
         let hidden_error = self.weights_ho.transpose() * &output_error;
         // Gradient Descent
-        let ones = Vector::from_fn(output.size(), |_| 1f64);
-        let ones_minus_output = &ones - &output;
-        self.weights_ho += self.learn_rate
-            * (output_error
-                .elemul(&output.clone().elemul(&ones_minus_output))
-                .dot(&hidden_out));
-        let ones = Vector::from_fn(hidden_out.size(), |_| 1f64);
-        let ones_minus_hidden_out = ones - &hidden_out;
-        self.weights_ih += self.learn_rate
-            * (hidden_error
-                .elemul(&hidden_out.clone().elemul(&ones_minus_hidden_out))
-                .dot(&sample.input));
+        let sigmoid_grads: Vector<f64> = output
+            .into_iter()
+            .map(|out| Sigmoid::gradient_from_output(out))
+            .collect();
+        self.weights_ho += self.learn_rate * (output_error.elemul(&sigmoid_grads)).dot(&hidden_out);
+        let sigmoid_grads: Vector<f64> = hidden_out
+            .into_iter()
+            .map(|out| Sigmoid::gradient_from_output(out))
+            .collect();
+        self.weights_ih +=
+            self.learn_rate * (hidden_error.elemul(&sigmoid_grads)).dot(&sample.input);
     }
 
     /// Process the net to get an output vector to the given sample.
@@ -100,11 +99,17 @@ impl NN {
     fn query_all(&self, input: &Vector<f64>) -> (Vector<f64>, Vector<f64>) {
         let hidden_summed: Vector<f64> = &self.weights_ih * input;
         assert_eq!(&hidden_summed.size(), &self.weights_ih.rows());
-        let hidden_activated: Vector<f64> = hidden_summed.into_iter().map(|x| sigmoid(x)).collect();
+        let hidden_activated: Vector<f64> = hidden_summed
+            .into_iter()
+            .map(|x| Sigmoid::eval_at(x))
+            .collect();
         assert_eq!(&hidden_activated.size(), &self.weights_ih.rows());
         let output_summed: Vector<f64> = &self.weights_ho * &hidden_activated;
         assert_eq!(&output_summed.size(), &self.weights_ho.rows());
-        let output_activated: Vector<f64> = output_summed.into_iter().map(|x| sigmoid(x)).collect();
+        let output_activated: Vector<f64> = output_summed
+            .into_iter()
+            .map(|x| Sigmoid::eval_at(x))
+            .collect();
         assert_eq!(&output_activated.size(), &self.weights_ho.rows());
         (hidden_activated, output_activated)
     }
