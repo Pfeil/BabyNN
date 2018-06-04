@@ -76,13 +76,24 @@ impl NN {
             .into_iter()
             .map(|out| Sigmoid::gradient_from_output(out))
             .collect();
-        self.weights_ho += self.learn_rate * (output_error.elemul(&sigmoid_grads)).dot(&hidden_out);
+        self.weights_ho += self.learn_rate
+            * output_error
+            .into_iter()
+            .zip(&sigmoid_grads)
+            .map(|(err, grad)| err * grad)
+            .collect::<Vector<f64>>()
+            .dot(&hidden_out);
         let sigmoid_grads: Vector<f64> = hidden_out
             .into_iter()
             .map(|out| Sigmoid::gradient_from_output(out))
             .collect();
-        self.weights_ih +=
-            self.learn_rate * (hidden_error.elemul(&sigmoid_grads)).dot(&sample.input);
+        self.weights_ih += self.learn_rate
+            * hidden_error
+            .into_iter()
+            .zip(&sigmoid_grads)
+            .map(|(err, grad)| err * grad)
+            .collect::<Vector<f64>>()
+            .dot(&sample.input);
     }
 
     /// Process the net to get an output vector to the given sample.
