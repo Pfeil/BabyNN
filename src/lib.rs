@@ -78,22 +78,22 @@ impl NN {
             .collect();
         self.weights_ho += self.learn_rate
             * output_error
-            .into_iter()
-            .zip(&sigmoid_grads)
-            .map(|(err, grad)| err * grad)
-            .collect::<Vector<f64>>()
-            .dot(&hidden_out);
+                .into_iter()
+                .zip(&sigmoid_grads)
+                .map(|(err, grad)| err * grad)
+                .collect::<Vector<f64>>()
+                .dot(&hidden_out);
         let sigmoid_grads: Vector<f64> = hidden_out
             .into_iter()
             .map(|out| Sigmoid::gradient_from_output(out))
             .collect();
         self.weights_ih += self.learn_rate
             * hidden_error
-            .into_iter()
-            .zip(&sigmoid_grads)
-            .map(|(err, grad)| err * grad)
-            .collect::<Vector<f64>>()
-            .dot(&sample.input);
+                .into_iter()
+                .zip(&sigmoid_grads)
+                .map(|(err, grad)| err * grad)
+                .collect::<Vector<f64>>()
+                .dot(&sample.input);
     }
 
     /// Process the net to get an output vector to the given sample.
@@ -109,19 +109,18 @@ impl NN {
     /// It is used in the training routine only and is therefore private.
     fn query_all(&self, input: &Vector<f64>) -> (Vector<f64>, Vector<f64>) {
         let hidden_summed: Vector<f64> = &self.weights_ih * input;
-        assert_eq!(&hidden_summed.size(), &self.weights_ih.rows());
+        assert!(&hidden_summed.argmax().1.abs() < &4.);
         let hidden_activated: Vector<f64> = hidden_summed
             .into_iter()
             .map(|x| Sigmoid::eval_at(x))
             .collect();
-        assert_eq!(&hidden_activated.size(), &self.weights_ih.rows());
+
         let output_summed: Vector<f64> = &self.weights_ho * &hidden_activated;
-        assert_eq!(&output_summed.size(), &self.weights_ho.rows());
+        assert!(&output_summed.argmax().1.abs() < &4.);
         let output_activated: Vector<f64> = output_summed
             .into_iter()
             .map(|x| Sigmoid::eval_at(x))
             .collect();
-        assert_eq!(&output_activated.size(), &self.weights_ho.rows());
         (hidden_activated, output_activated)
     }
 
@@ -140,7 +139,7 @@ impl NN {
 
 /// `Sample` Represents an input vector with the desired output vector.
 /// This way, a Neural Net can learn what to return for a given data.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Sample {
     pub input: Vector<f64>,
     pub target: Vector<f64>,
