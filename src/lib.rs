@@ -145,6 +145,16 @@ pub struct Sample {
     pub target: Vector<f64>,
 }
 
+impl std::fmt::Display for NN {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(
+            f,
+            "NN: rate: {}\n{:.2}\n{:.2}\n",
+            self.learn_rate, self.weights_ih, self.weights_ho
+        )
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
